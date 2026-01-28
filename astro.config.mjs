@@ -1,12 +1,12 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
-import tailwindcss from '@tailwindcss/vite';
 import cloudflare from '@astrojs/cloudflare';
+import tailwind from '@astrojs/tailwind';
 
 export default defineConfig({
-  output: "server",
+  output: 'server',
   adapter: cloudflare(),
-  vite: {
-    plugins: [tailwindcss()]
-  }
+  integrations: [
+    tailwind()
+  ]
 });
