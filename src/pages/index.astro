@@ -1,6 +1,8 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import QuoteCalculator from "../components/QuoteCalculator.astro";
+import heroHighDusting from "../assets/hero-high-dusting.jpg";
+import katiePortrait from "../assets/katie-owner-portrait.jpg";
 ---
 
 <Layout>
@@ -49,8 +51,8 @@ import QuoteCalculator from "../components/QuoteCalculator.astro";
       aria-hidden="true"
     >
       <img
-        src="https://images.pexels.com/photos/4107284/pexels-photo-4107284.jpeg?auto=compress&cs=tinysrgb&w=1200"
-        alt="Bright, clean living room after a professional cleaning"
+        src={heroHighDusting.src}
+        alt="Professional cleaner dusting high fixtures in a residential home"
         loading="lazy"
         class="h-full w-full object-cover"
       />
@@ -135,6 +137,40 @@ import QuoteCalculator from "../components/QuoteCalculator.astro";
             We plan routes to minimize drive time and maximize time spent making your space sparkle.
           </p>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="space-y-4 border-t border-slate-200 pt-8 md:space-y-6 md:pt-10">
+    <div class="space-y-2">
+      <h2 class="text-xl font-semibold text-slate-900 md:text-2xl">
+        Meet Your Cleaner
+      </h2>
+      <p class="max-w-2xl text-sm text-slate-600 md:text-base">
+        Sparkle Solutions 757 is built on kindness, trust, and detailed work—so you always feel safe
+        inviting us into your home.
+      </p>
+    </div>
+
+    <div class="grid gap-6 md:grid-cols-[auto,minmax(0,1.6fr)] md:items-center">
+      <div class="flex justify-center md:justify-start">
+        <img
+          src={katiePortrait.src}
+          alt="Katie, owner of Sparkle Solutions 757"
+          loading="lazy"
+          class="h-32 w-32 rounded-full border border-slate-200 object-cover shadow-sm md:h-40 md:w-40"
+        />
+      </div>
+      <div class="space-y-3 text-sm text-slate-700 md:text-base">
+        <p>
+          Hi, I'm Katie! I founded Sparkle Solutions 757 to provide judgment-free, detailed cleaning
+          for busy families. Whether your home needs a gentle reset or a deep refresh, you’ll always
+          be met with respect, care, and zero shame.
+        </p>
+        <p class="text-slate-600">
+          We work around real life—kids, pets, laundry piles and all—so you can breathe easier the
+          moment you walk back through the door.
+        </p>
       </div>
     </div>
   </section>
