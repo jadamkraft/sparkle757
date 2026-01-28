@@ -1,0 +1,253 @@
+---
+const basePrice = 100;
+const perBedroom = 30;
+const perBathroom = 20;
+---
+
+<section
+  class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/60 md:p-6"
+  aria-label="Instant quote calculator"
+>
+  <form class="grid gap-4 md:grid-cols-3 md:gap-5" id="quote-calculator-form">
+    <div class="space-y-1.5">
+      <label for="bedrooms" class="text-xs font-medium text-slate-700 md:text-sm">
+        Bedrooms
+      </label>
+      <select
+        id="bedrooms"
+        name="bedrooms"
+        class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none ring-pink-500/40 transition focus:ring md:text-base"
+      >
+        <option value="1">1 bedroom</option>
+        <option value="2">2 bedrooms</option>
+        <option value="3">3 bedrooms</option>
+        <option value="4">4 bedrooms</option>
+        <option value="5">5 bedrooms</option>
+        <option value="6">6+ bedrooms</option>
+      </select>
+    </div>
+
+    <div class="space-y-1.5">
+      <label for="bathrooms" class="text-xs font-medium text-slate-700 md:text-sm">
+        Bathrooms
+      </label>
+      <select
+        id="bathrooms"
+        name="bathrooms"
+        class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none ring-pink-500/40 transition focus:ring md:text-base"
+      >
+        <option value="1">1 bathroom</option>
+        <option value="2">2 bathrooms</option>
+        <option value="3">3 bathrooms</option>
+        <option value="4">4+ bathrooms</option>
+      </select>
+    </div>
+
+    <div class="space-y-1.5">
+      <label for="zip" class="text-xs font-medium text-slate-700 md:text-sm">
+        Zip code
+      </label>
+      <input
+        id="zip"
+        name="zip"
+        type="text"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        maxlength="5"
+        autocomplete="postal-code"
+        placeholder="e.g. 23451"
+        class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none ring-pink-500/40 transition focus:ring md:text-base"
+      />
+      <p class="text-[11px] text-slate-500 md:text-xs">
+        Used only to confirm you’re in our service area. No spam, ever.
+      </p>
+    </div>
+  </form>
+
+  <div
+    class="mt-5 grid gap-4 rounded-2xl bg-slate-50/80 p-4 text-sm text-slate-700 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] md:items-center md:text-base"
+  >
+    <div class="space-y-1.5">
+      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+        Estimated price range
+      </p>
+      <p
+        id="estimate-display"
+        class="text-2xl font-semibold text-slate-900 md:text-3xl"
+      >
+        $150 – $190
+      </p>
+      <p class="text-xs text-slate-600 md:text-sm">
+        This is a transparent estimate, not a contract. We’ll confirm the final price together
+        based on your home and preferences.
+      </p>
+    </div>
+
+    <div class="space-y-2">
+      <button
+        id="book-price-button"
+        type="button"
+        class="flex w-full items-center justify-center rounded-full bg-gradient-to-r from-pink-500 to-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-pink-500/30 transition hover:shadow-lg hover:brightness-105 md:px-5"
+      >
+        Book this price
+      </button>
+      <p class="text-[11px] text-slate-500 md:text-xs">
+        You’ll jump to a quick contact form with these details pre-filled. No obligation, ever.
+      </p>
+    </div>
+  </div>
+</section>
+
+<dialog
+  id="quote-modal"
+  class="max-w-md rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-800 shadow-xl backdrop:bg-slate-900/40 md:p-6"
+>
+  <form method="dialog" class="space-y-4">
+    <header class="space-y-1">
+      <p
+        class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+      >
+        Almost there
+      </p>
+      <h2 class="text-lg font-semibold text-slate-900">
+        Lock in your sparkle session
+      </h2>
+      <p class="text-xs text-slate-600 md:text-sm">
+        Share a few details and we’ll follow up with a friendly confirmation—no pressure, no pushy
+        sales calls.
+      </p>
+    </header>
+
+    <div class="grid gap-3">
+      <div class="space-y-1">
+        <label for="modal-name" class="text-xs font-medium text-slate-700">
+          Name
+        </label>
+        <input
+          id="modal-name"
+          name="name"
+          type="text"
+          required
+          class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm shadow-sm outline-none ring-pink-500/40 transition focus:ring"
+        />
+      </div>
+
+      <div class="space-y-1">
+        <label for="modal-email" class="text-xs font-medium text-slate-700">
+          Email
+        </label>
+        <input
+          id="modal-email"
+          name="email"
+          type="email"
+          required
+          class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm shadow-sm outline-none ring-pink-500/40 transition focus:ring"
+        />
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 text-xs">
+        <div class="space-y-0.5">
+          <p class="font-medium text-slate-700">Bedrooms</p>
+          <p id="summary-bedrooms" class="text-slate-600">2</p>
+        </div>
+        <div class="space-y-0.5">
+          <p class="font-medium text-slate-700">Bathrooms</p>
+          <p id="summary-bathrooms" class="text-slate-600">2</p>
+        </div>
+        <div class="space-y-0.5">
+          <p class="font-medium text-slate-700">Zip</p>
+          <p id="summary-zip" class="text-slate-600">23451</p>
+        </div>
+      </div>
+
+      <div class="space-y-1">
+        <label for="modal-notes" class="text-xs font-medium text-slate-700">
+          Anything you’d like us to know?
+        </label>
+        <textarea
+          id="modal-notes"
+          name="notes"
+          rows="3"
+          class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm shadow-sm outline-none ring-pink-500/40 transition focus:ring"
+          placeholder="Pets, special requests, rooms to skip—share whatever helps us take great care of your space."
+        />
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between gap-3 pt-2">
+      <button
+        type="submit"
+        class="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-pink-500 to-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-pink-500/30 transition hover:shadow-lg hover:brightness-105"
+      >
+        Request my cleaning
+      </button>
+      <button
+        value="cancel"
+        class="text-xs font-medium text-slate-500 underline-offset-2 hover:text-slate-700 hover:underline"
+      >
+        Not ready yet
+      </button>
+    </div>
+  </form>
+</dialog>
+
+<script type="module">
+  const base = { basePrice: {basePrice}, perBedroom: {perBedroom}, perBathroom: {perBathroom} };
+
+  function calculateTotal(bedrooms, bathrooms) {
+    const b = Number.isNaN(bedrooms) ? 0 : bedrooms;
+    const ba = Number.isNaN(bathrooms) ? 0 : bathrooms;
+    return base.basePrice + base.perBedroom * b + base.perBathroom * ba;
+  }
+
+  function formatRange(total) {
+    const low = Math.round(total * 0.9);
+    const high = Math.round(total * 1.1);
+    const fmt = (n) => n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    return `$${fmt(low)} – $${fmt(high)}`;
+  }
+
+  const form = document.querySelector("#quote-calculator-form");
+  const bedroomsEl = form?.querySelector("#bedrooms");
+  const bathroomsEl = form?.querySelector("#bathrooms");
+  const zipEl = form?.querySelector("#zip");
+  const estimateEl = document.querySelector("#estimate-display");
+  const bookButton = document.querySelector("#book-price-button");
+  const modal = document.querySelector("#quote-modal");
+  const summaryBedrooms = document.querySelector("#summary-bedrooms");
+  const summaryBathrooms = document.querySelector("#summary-bathrooms");
+  const summaryZip = document.querySelector("#summary-zip");
+
+  function updateEstimate() {
+    if (!bedroomsEl || !bathroomsEl || !estimateEl) return;
+    const bedrooms = parseInt(bedroomsEl.value || "0", 10);
+    const bathrooms = parseInt(bathroomsEl.value || "0", 10);
+    const total = calculateTotal(bedrooms, bathrooms);
+    estimateEl.textContent = formatRange(total);
+  }
+
+  bedroomsEl?.addEventListener("change", updateEstimate);
+  bathroomsEl?.addEventListener("change", updateEstimate);
+
+  // Initialize on load
+  updateEstimate();
+
+  bookButton?.addEventListener("click", () => {
+    if (!modal || typeof modal.showModal !== "function") {
+      const params = new URLSearchParams();
+      if (bedroomsEl) params.set("bedrooms", bedroomsEl.value);
+      if (bathroomsEl) params.set("bathrooms", bathroomsEl.value);
+      if (zipEl && zipEl.value) params.set("zip", zipEl.value);
+      window.location.href = `/contact?${params.toString()}`;
+      return;
+    }
+
+    if (summaryBedrooms && bedroomsEl) summaryBedrooms.textContent = bedroomsEl.value || "—";
+    if (summaryBathrooms && bathroomsEl) summaryBathrooms.textContent = bathroomsEl.value || "—";
+    if (summaryZip && zipEl) summaryZip.textContent = zipEl.value || "—";
+
+    modal.showModal();
+  });
+</script>
+
+
