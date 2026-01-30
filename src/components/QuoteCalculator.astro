@@ -1,13 +1,61 @@
 ---
-const basePrice = 100;
+const standardBase = 120;
 const perBedroom = 30;
-const perBathroom = 20;
+const perBathroom = 40;
+const standardCap = 480;
+const deepRate = 55;
+const deepFactor = 1.5;
 ---
 
 <section
   class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-200/60 md:p-6"
   aria-label="Instant quote calculator"
 >
+  <div class="mb-4 space-y-2">
+    <p class="text-xs font-medium text-slate-700 md:text-sm" id="service-type-label">
+      Service type
+    </p>
+    <div
+      class="inline-flex rounded-full border border-slate-200 bg-slate-100 p-0.5 shadow-sm"
+      role="radiogroup"
+      aria-labelledby="service-type-label"
+    >
+      <label
+        class="relative cursor-pointer rounded-full px-4 py-2 text-sm font-medium transition focus-within:ring-2 focus-within:ring-pink-500/40 focus-within:ring-offset-1 md:px-5"
+      >
+        <input
+          type="radio"
+          name="serviceType"
+          value="standard"
+          checked
+          class="sr-only"
+        />
+        <span
+          class="service-type-option rounded-full px-3 py-1 shadow-md shadow-pink-500/30 bg-gradient-to-r from-pink-500 to-violet-600 text-white"
+          data-value="standard"
+        >
+          Standard Routine Clean
+        </span>
+      </label>
+      <label
+        class="relative cursor-pointer rounded-full px-4 py-2 text-sm font-medium text-slate-700 transition focus-within:ring-2 focus-within:ring-pink-500/40 focus-within:ring-offset-1 md:px-5"
+      >
+        <input
+          type="radio"
+          name="serviceType"
+          value="deep"
+          class="sr-only"
+        />
+        <span
+          class="service-type-option rounded-full px-3 py-1 text-slate-600"
+          data-value="deep"
+        >
+          Deep / Move-In / Move-Out
+        </span>
+      </label>
+    </div>
+  </div>
+
   <form class="grid gap-4 md:grid-cols-3 md:gap-5" id="quote-calculator-form">
     <div class="space-y-1.5">
       <label for="bedrooms" class="text-xs font-medium text-slate-700 md:text-sm">
@@ -68,14 +116,20 @@ const perBathroom = 20;
     class="mt-5 grid gap-4 rounded-2xl bg-slate-50/80 p-4 text-sm text-slate-700 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] md:items-center md:text-base"
   >
     <div class="space-y-1.5">
-      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-        Estimated price range
+      <p id="estimate-label" class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+        Estimated Flat Rate
       </p>
       <p
         id="estimate-display"
         class="text-2xl font-semibold text-slate-900 md:text-3xl"
       >
-        $150 – $190
+        Estimated Flat Rate: $110 – $130
+      </p>
+      <p id="estimate-deep-subtext" class="hidden text-xs text-slate-600 md:text-sm">
+        Est. Time: 4.5 – 5.5 Hours
+      </p>
+      <p class="text-xs text-slate-500 md:text-sm">
+        Final price subject to in-person walkthrough.
       </p>
       <p class="text-xs text-slate-600 md:text-sm">
         This is a transparent estimate, not a contract. We’ll confirm the final price together
@@ -145,7 +199,11 @@ const perBathroom = 20;
         />
       </div>
 
-      <div class="grid grid-cols-3 gap-2 text-xs">
+      <div class="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
+        <div class="space-y-0.5">
+          <p class="font-medium text-slate-700">Service</p>
+          <p id="summary-service-type" class="text-slate-600">Standard</p>
+        </div>
         <div class="space-y-0.5">
           <p class="font-medium text-slate-700">Bedrooms</p>
           <p id="summary-bedrooms" class="text-slate-600">2</p>
@@ -192,19 +250,42 @@ const perBathroom = 20;
 </dialog>
 
 <script type="module">
-  const base = { basePrice: {basePrice}, perBedroom: {perBedroom}, perBathroom: {perBathroom} };
+  const config = {
+    standardBase: {standardBase},
+    perBedroom: {perBedroom},
+    perBathroom: {perBathroom},
+    standardCap: {standardCap},
+    deepRate: {deepRate},
+    deepFactor: {deepFactor},
+  };
 
-  function calculateTotal(bedrooms, bathrooms) {
-    const b = Number.isNaN(bedrooms) ? 0 : bedrooms;
-    const ba = Number.isNaN(bathrooms) ? 0 : bathrooms;
-    return base.basePrice + base.perBedroom * b + base.perBathroom * ba;
+  function getStandardCappedPrice(bedrooms, bathrooms) {
+    const b = Number.isNaN(bedrooms) || bedrooms < 1 ? 1 : bedrooms;
+    const ba = Number.isNaN(bathrooms) || bathrooms < 1 ? 1 : bathrooms;
+    const price =
+      config.standardBase +
+      (b - 1) * config.perBedroom +
+      (ba - 1) * config.perBathroom;
+    return Math.min(Math.max(0, price), config.standardCap);
   }
 
-  function formatRange(total) {
-    const low = Math.round(total * 0.9);
-    const high = Math.round(total * 1.1);
-    const fmt = (n) => n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-    return `$${fmt(low)} – $${fmt(high)}`;
+  function formatStandardRange(cappedPrice) {
+    const low = Math.max(0, cappedPrice - 10);
+    const high = Math.min(config.standardCap, cappedPrice + 10);
+    const fmt = (n) =>
+      n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    return `Estimated Flat Rate: $${fmt(low)} – $${fmt(high)}`;
+  }
+
+  function getDeepHours(cappedPrice) {
+    const baseHours = cappedPrice / 40;
+    return baseHours * config.deepFactor;
+  }
+
+  function formatDeepHoursRange(deepHours) {
+    const low = Math.max(0.5, Math.round((deepHours - 0.5) * 10) / 10);
+    const high = Math.round((deepHours + 0.5) * 10) / 10;
+    return `Est. Time: ${low} – ${high} Hours`;
   }
 
   const form = document.querySelector("#quote-calculator-form");
@@ -212,24 +293,59 @@ const perBathroom = 20;
   const bathroomsEl = form?.querySelector("#bathrooms");
   const zipEl = form?.querySelector("#zip");
   const estimateEl = document.querySelector("#estimate-display");
+  const estimateLabel = document.querySelector("#estimate-label");
+  const estimateDeepSubtext = document.querySelector("#estimate-deep-subtext");
   const bookButton = document.querySelector("#book-price-button");
   const modal = document.querySelector("#quote-modal");
   const summaryBedrooms = document.querySelector("#summary-bedrooms");
   const summaryBathrooms = document.querySelector("#summary-bathrooms");
   const summaryZip = document.querySelector("#summary-zip");
+  const summaryServiceType = document.querySelector("#summary-service-type");
+
+  const selectedOptionClasses =
+    "service-type-option rounded-full px-3 py-1 bg-gradient-to-r from-pink-500 to-violet-600 text-white shadow-md shadow-pink-500/30";
+  const unselectedOptionClasses =
+    "service-type-option rounded-full px-3 py-1 text-slate-600";
+
+  function updateToggleStyling() {
+    const checked = document.querySelector('input[name="serviceType"]:checked');
+    document.querySelectorAll(".service-type-option").forEach((span) => {
+      const isSelected = span.getAttribute("data-value") === checked?.value;
+      span.className = isSelected ? selectedOptionClasses : unselectedOptionClasses;
+    });
+  }
 
   function updateEstimate() {
     if (!bedroomsEl || !bathroomsEl || !estimateEl) return;
-    const bedrooms = parseInt(bedroomsEl.value || "0", 10);
-    const bathrooms = parseInt(bathroomsEl.value || "0", 10);
-    const total = calculateTotal(bedrooms, bathrooms);
-    estimateEl.textContent = formatRange(total);
+    const bedrooms = parseInt(bedroomsEl.value || "1", 10);
+    const bathrooms = parseInt(bathroomsEl.value || "1", 10);
+    const isDeep =
+      document.querySelector('input[name="serviceType"]:checked')?.value === "deep";
+    const cappedPrice = getStandardCappedPrice(bedrooms, bathrooms);
+
+    updateToggleStyling();
+
+    if (isDeep) {
+      estimateLabel.textContent = "Hourly Rate";
+      estimateEl.textContent = `Hourly Rate: $${config.deepRate}/hr`;
+      const deepHours = getDeepHours(cappedPrice);
+      if (estimateDeepSubtext) {
+        estimateDeepSubtext.textContent = formatDeepHoursRange(deepHours);
+        estimateDeepSubtext.classList.remove("hidden");
+      }
+    } else {
+      estimateLabel.textContent = "Estimated Flat Rate";
+      estimateEl.textContent = formatStandardRange(cappedPrice);
+      if (estimateDeepSubtext) estimateDeepSubtext.classList.add("hidden");
+    }
   }
 
+  document.querySelectorAll('input[name="serviceType"]').forEach((radio) => {
+    radio.addEventListener("change", updateEstimate);
+  });
   bedroomsEl?.addEventListener("change", updateEstimate);
   bathroomsEl?.addEventListener("change", updateEstimate);
 
-  // Initialize on load
   updateEstimate();
 
   bookButton?.addEventListener("click", () => {
@@ -238,10 +354,16 @@ const perBathroom = 20;
       if (bedroomsEl) params.set("bedrooms", bedroomsEl.value);
       if (bathroomsEl) params.set("bathrooms", bathroomsEl.value);
       if (zipEl && zipEl.value) params.set("zip", zipEl.value);
+      const serviceType = document.querySelector('input[name="serviceType"]:checked')?.value;
+      if (serviceType) params.set("serviceType", serviceType);
       window.location.href = `/contact?${params.toString()}`;
       return;
     }
 
+    if (summaryServiceType) {
+      const serviceType = document.querySelector('input[name="serviceType"]:checked')?.value;
+      summaryServiceType.textContent = serviceType === "deep" ? "Deep" : "Standard";
+    }
     if (summaryBedrooms && bedroomsEl) summaryBedrooms.textContent = bedroomsEl.value || "—";
     if (summaryBathrooms && bathroomsEl) summaryBathrooms.textContent = bathroomsEl.value || "—";
     if (summaryZip && zipEl) summaryZip.textContent = zipEl.value || "—";
