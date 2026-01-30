@@ -249,15 +249,8 @@ const deepFactor = 1.5;
   </form>
 </dialog>
 
-<script type="module">
-  const config = {
-    standardBase: {standardBase},
-    perBedroom: {perBedroom},
-    perBathroom: {perBathroom},
-    standardCap: {standardCap},
-    deepRate: {deepRate},
-    deepFactor: {deepFactor},
-  };
+<script define:vars={{ standardBase, perBedroom, perBathroom, standardCap, deepRate, deepFactor }}>
+  const config = { standardBase, perBedroom, perBathroom, standardCap, deepRate, deepFactor };
 
   function getStandardCappedPrice(bedrooms, bathrooms) {
     const b = Number.isNaN(bedrooms) || bedrooms < 1 ? 1 : bedrooms;
